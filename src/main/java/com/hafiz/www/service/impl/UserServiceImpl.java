@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Desc:用户表相关的servie接口实现类
- *
- * Created by hafiz.zhang on 2016/8/27.
+ * 用户表相关的servie接口实现类
  */
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,4 +21,11 @@ public class UserServiceImpl implements UserService {
     public List<UserEntity> getAllUsers() {
         return mapper.getAllUsers();
     }
+
+    @Override
+    public void save(UserEntity userEntity) {
+        mapper.save(userEntity);
+    }
+
+
 }

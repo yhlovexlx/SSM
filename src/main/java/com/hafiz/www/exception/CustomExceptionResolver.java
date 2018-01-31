@@ -7,8 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Desc:全局异常处理器
- * Created by hafiz.zhang on 2016/8/27.
+ * 全局异常处理器
  */
 public class CustomExceptionResolver implements HandlerExceptionResolver {
     @Override

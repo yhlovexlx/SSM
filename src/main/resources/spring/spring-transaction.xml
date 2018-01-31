@@ -7,10 +7,8 @@
 		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
 		http://www.springframework.org/schema/tx 
 		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd ">
-		
-		<!-- 事务管理器
-			对mybatis操作数据库进行事务控制，spring使用jdbc的事务控制类
-		 -->
+
+		<!-- 事务管理器对mybatis操作数据库进行事务控制，spring使用jdbc的事务控制类-->
 		 <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		 	<!-- dataSource在spring-dao.xml 中进行了配置 -->
 		 	<property name="dataSource" ref="dataSource"></property>
@@ -31,8 +29,9 @@
 		 		</tx:attributes>
 		 </tx:advice>
 		 
-		 <!-- 定义aop切面 -->
+		 <!-- 定义aop切面:execution(* com.soft.service.*.*(..))：第一个*表示方法返回子类型，第二个表示某个类，第三个表示某个方法，(..)表示入参  -->
 		 <aop:config>
-		 	<aop:advisor advice-ref="txAdvice" pointcut="execution(* com.hafiz.www.service.impl.*.*(..))"/>
+		 	<!--<aop:advisor advice-ref="txAdvice" pointcut="execution(* com.hafiz.www.service.impl.*.*(..))"/>-->
+			 <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.hafiz.www.controller.*.*(..))"/>
 		 </aop:config>
 </beans>

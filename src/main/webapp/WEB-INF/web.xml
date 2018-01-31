@@ -1,72 +1,105 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
     http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
-  <display-name>pegasus-scm</display-name>
+    <!-- Web项目初始化过程:
+        1.在启动项目时，web容器(tomcat)会读取web.xml配置文件中的<listener>和<contex-param>节点
+        2.接着web容器会创建一个ServletContext上下文，应用范围内即整个Web项目都能使用这个上下文
+        3.接着web容器会将读取到的多个<contex-param>配置的name和value转化为键值对，并交给ServletContext
+        4.web容器创建<listener></listener>中的类实例，即创建监听(备注：listener定义的类可以是自定义的类，但必须继承ServletContextListener)。
+        5.在监听的类中(包括自定义监听)会有一个contextInitialized(ServletContextEvent event)初始化方法，在这个方法中可以通过event.getServletContext().getInitParameter("contextConfigLocation") 来得到context-param 设定的值。
+          在这个类中还必须有一个contextDestroyed(ServletContextEvent event) 销毁方法.用于关闭应用前释放资源，比如说数据库连接的关闭。
+        6.得到这个context-param的值之后,你就可以做一些操作了.注意,这个时候你的WEB项目还没有完全启动完成.这个动作会比所有的Servlet都要早。
+        总结：Web容器对于web.xml的加载过程是：context-param >> listener  >> fileter  >> servlet
+     -->
 
-  <!-- param -->
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:spring/spring.xml</param-value>
-  </context-param>
+    <!-- 定义站台的名称 -->
+    <display-name>pegasus-scm</display-name>
 
-  <!-- 配置log4j配置文件路径 -->
-  <context-param>
-    <param-name>log4jConfigLocation</param-name>
-    <param-value>classpath:log4j.properties</param-value>
-  </context-param>
-  <!-- 60s 检测日志配置 文件变化 -->
-  <context-param>
-    <param-name>log4jRefreshInterval</param-name>
-    <param-value>60000</param-value>
-  </context-param>
+    <!-- 该元素用来声明应用范围(整个WEB项目)内的上下文初始化参数 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring/spring.xml</param-value>
+    </context-param>
 
-  <!-- EncodingFilter -->
-  <filter>
-    <filter-name>encodingFilter</filter-name>
-    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-    <init-param>
-      <param-name>forceEncoding</param-name>
-      <param-value>true</param-value>
-    </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>encodingFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
+    <!-- 配置log4j配置文件路径 -->
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>classpath:log4j.properties</param-value>
+    </context-param>
+    <!-- 60s 检测日志配置 文件变化 -->
+    <context-param>
+        <param-name>log4jRefreshInterval</param-name>
+        <param-value>60000</param-value>
+    </context-param>
 
-  <!-- listener -->
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-  </listener>
-  <!-- 配置Log4j监听器 -->
-  <listener>
-    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-  </listener>
+    <!-- 配置Spring的字符集过滤器：
+        a.不配置forceEncoding，则默认为false，此时只设置request.setCharacterEncoding("utf-8")
+        b.配置forceEncoding为true，此时设置了request.setCharacterEncoding("utf-8")和response.setCharacterEncoding(utf-8);
+        备注：如果配置无效的话，可以检查一下tomcat的server.xml文件，server.xml如果不配置编码格式，则默认是iso-8859-1，加上即可
+              <Connector connectionTimeout="20000" port="8080" protocol="HTTP/1.1" redirectPort="8443" URIEncoding="UTF-8"/>
+    -->
+    <!-- c.url-pattern的"/"和"/*"的区别：
+         "/":会匹配到/springmvc这样的路径型url，不会匹配到模式为*.jsp这样的后缀型url
+         "/*":会匹配所有的url：路径型的和后缀型的url(包括/springmvc，.jsp，.js和*.html等)。
+    -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-  <!-- spring mvc -->
-  <servlet>
-    <servlet-name>dispatcher</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <init-param>
-      <description>spring mvc config file</description>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:spring/spring-mvc.xml</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>dispatcher</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
+    <!-- 自定义过滤器，需要实现Filter接口 -->
+    <filter>
+        <filter-name>authCheckFilter</filter-name>
+        <filter-class>com.hafiz.www.filter.AuthorizationCheckFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>authCheckFilter</filter-name>
+        <url-pattern>/</url-pattern>
+    </filter-mapping>
 
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
+    <!-- 根据context-param中要加载的配置文件，比如spring.xml,生成一个ApplicationContext(spring上下文)
+         如果你的web应用中用不到ApplicationContext,那么这个监听无需配置 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!-- 监听器监听HTTP请求事件，web服务器接收的每一次请求都会通知该监听器。-->
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+    <!-- 配置Log4j监听器 -->
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+
+    <!-- springmvc核心控制器：springmvc容器-->
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <description>spring mvc config file</description>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring/spring-mvc.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>

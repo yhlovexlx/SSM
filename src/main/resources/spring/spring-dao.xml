@@ -1,13 +1,59 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
 		http://www.springframework.org/schema/context 
-		http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<!-- 加载配置文件jdbc.properties中的内容，jdbc.properties中key的命名要有一定的特殊规则 -->
-	<context:property-placeholder location="classpath:jdbc.properties"/>
+	<!-- 加载配置文件jdbc.properties文件有五种方式 -->
+	<!-- 方式一：通过PropertyPlaceholderConfigurer加载 -->
+	<!-- 有下面两种形式；此种情况下，jdbc.properties中key的命名要有一定的特殊规则 -->
+	<!-- ignore-unresolvable表示：是否忽略解析不到的属性，如果不忽略，找不到将抛出异常 -->
+
+
+	<context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
+	<!-- 资源属性配置器，可以将一个bean的内容放在一个properties文件中
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	-->
+
+	<!-- 方式二：使用PropertiesFactoryBean加载 -->
+	<bean id="prop" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<!-- 这里是PropertiesFactoryBean类，它也有个locations属性，也是接收一个数组，跟上面一样 -->
+		<property name="locations">
+			<array>
+				<value>classpath:jdbc.properties</value>
+			</array>
+		</property>
+	</bean>
+
+	<!-- 方式三：使用util:properties标签进行暴露properties文件中的内容 -->
+	<util:properties id="propertiesReader" location="classpath:jdbc.properties"/>
+
+	<!-- 方式四：通过PropertyPlaceholderConfigurer在加载上下文的时候暴露properties到自定义子类的属性中以供程序中使用：类需要实现PropertyPlaceholderConfigurer接口 -->
+	<bean id="propertyConfig" class="com.hafiz.www.util.PropertyConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="ignoreResourceNotFound" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 方式五：自定义工具类，采用类加载器或者类进行获取资源 -->
+	<!-- 1.通过类加载器进行获取properties文件流:in = PropertyUtil.class.getClassLoader().getResourceAsStream("jdbc.properties"); -->
+	<!-- 2.通过类进行获取properties文件流in = PropertyUtil.class.getResourceAsStream("/jdbc.properties"); -->
+
+
 	<!-- 配置数据源,数据库连接池 -->
 	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
 		<!--数据库驱动-->
@@ -48,7 +94,7 @@
 		<property name="mapperLocations" value="classpath:mapper/*.xml"/>
 	</bean>
 
-	<!-- 配置mapper接口扫描器 -->
+	<!-- 配置mapper接口扫描器:MapperScannerConfigurer是将Mapper接口生成代理注入到Spring -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<!-- 要扫描的包的名称，有多个包时，包名之间用半角逗号隔开 -->
 		<property name="basePackage" value="com.hafiz.www.mapper"></property>

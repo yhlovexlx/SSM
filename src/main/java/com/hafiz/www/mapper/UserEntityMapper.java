@@ -5,8 +5,7 @@ import com.hafiz.www.po.UserEntity;
 import java.util.List;
 
 /**
- * Desc:用户表实体mapper接口类
- * Created by hafiz.zhang on 2016/8/27.
+ * 用户表实体mapper接口类
  */
 public interface UserEntityMapper {
 
@@ -16,4 +15,6 @@ public interface UserEntityMapper {
      * @return
      */
     List<UserEntity> getAllUsers();
+
+    void save(UserEntity userEntity);
 }

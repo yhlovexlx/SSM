@@ -1,28 +1,27 @@
 package com.hafiz.www.po;
 
 /**
- * Desc:用户表实体类
- * Created by hafiz.zhang on 2016/8/27.
+ * 用户表实体类
  */
 public class UserEntity {
-    private Long id;            // 编号
-    private String userName;    // 用户名
+    private Integer id;            // 编号
+    private String username;    // 用户名
     private String password;    // 密码
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

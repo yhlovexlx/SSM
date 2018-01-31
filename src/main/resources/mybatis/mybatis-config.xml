@@ -9,16 +9,20 @@
         <setting name="logImpl" value="SLF4J"/>
     </settings>-->
 
-    <!-- 设置别名 -->
+    <!-- 设置JavaBean的别名 -->
     <typeAliases>
-        <!-- 批量进行设置别名 -->
+        <!-- 批量进行设置别名：通过package, 可以直接指定package的名字， mybatis会自动扫描你指定包下面的javabean,
+             并且默认设置一个别名，默认的名字为： javabean 的首字母小写的非限定类名来作为它的别名。<package name="com.hafiz.www.po"/>
+             也可在javabean 加上注解@Alias 来自定义别名， 例如： @Alias(user)
+        -->
         <package name="com.hafiz.www.po"/>
     </typeAliases>
 
 
     <!-- 使用自动扫描器时，mapper.xml文件如果和mapper.java接口在一个目录则此处不用定义mappers -->
-    <!-- <mappers>
+    <mappers>
         <package name="com.hafiz.www.mapper" />
-    </mappers> -->
+    </mappers>
+
 
 </configuration>

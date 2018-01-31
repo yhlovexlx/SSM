@@ -5,7 +5,9 @@
 	http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <!-- Spring相关配置文件 -->
     <import resource="spring-dao.xml"/>
     <import resource="spring-service.xml"/>
+    <!-- Spring事务配置文件 -->
     <import resource="spring-transaction.xml"/>
 </beans>
